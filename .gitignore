@@ -1,0 +1,16 @@
+dataset/data
+dataset/cache
+dataset/camels
+dataset/data_camels
+dataset/__pycache__
+__pycache__
+.vscode
+tmp
+plots
+.venv
+dataset/nj
+dataset/processed_data
+dataset/processed*
+dataset/*.zip
+.weights
+dataset/rainfall_dataset.txt

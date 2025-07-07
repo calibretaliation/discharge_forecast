@@ -1,0 +1,164 @@
+Beach_ID,Beach_Name,Station_ID,Latitude,Longitude,Abbv_Name
+1,"River Ave.",RABCH001,40.088467,-74.073058,RivAve
+2,"Windward",RABCH002,40.056611,-74.111469,Windward
+3,"Money Island",RABCH003,39.948419,-74.163247,MnyIsnd
+4,"Wreck Pond",RABCH004,40.13838175,-74.02613091,WrPnd
+5,"Shark River Beach and Yacht Club",RABCH014,40.190758,-74.038703,SRBYC
+6,"Deal Lake",RABCH006,40.230614,-73.998006,DealLk
+7,"Lake Takanassee",RABCH007,40.276403,-73.984628,LkTak
+8,"L Street Beach in Belmar",RABCH005,40.177945,-74.033912,LStBeach
+11,"Lincoln Ave - Atlantic City",RABCH008,39.345993,-74.452998,LincolnAve
+12,"States Ave - Atlantic City",RABCH009,39.358644,-74.416982,StatesAve
+13,"26th St - Brigantine",RABCH010,39.399447,-74.384901,26thSt
+14,"33rd St - Longport",RABCH011,39.315144,-74.517482,33rdSt
+15,"Beachwood Beach",RABCH015,39.942531,-74.184731,BchwdBch
+16,"Barnegat Bathing",RABCH012,39.754222,-74.190775,BangtBath
+17,"Parkertown",RABCH013,39.609819,-74.292072,Prkrtwn
+20,"Cape May Point",RABCH016,38.931568,-74.96005,CapeMayPt
+21,"Sea Isle City",RABCH017,39.153812,-74.692239,SeaIsleCity
+22,"Bayonne",RABCH018,40.654477,-74.095734,Bayonne
+23,"Jersey City",RABCH019,40.723953,-74.051757,JerseyCity
+24,"Wildwood",RABCH020,38.991778,-74.81492,Wildwood
+25,"Ocean City",RABCH021,39.273842,-74.577423,OC
+26,"Highlands",RABCH022,40.40607383,-73.99541624,Highlands
+27,"Ideal Beach",RABCH023,40.443265,-74.112956,IdealBeach
+28,"Wildwood Gables",RABCH025,38.96968527,-74.83831816,Gables
+29,"Cape May City",RABCH024,38.93198755,-74.91279184,CMCity
+30,"Stone Harbor",RABCH026,39.05321744,-74.7618228,StnHrbr
+31,"Avalon",RABCH027,39.09876072,-74.71993444,Avalon
+32,"Palermo",RABCH028,39.23178883,-74.63161097,Palermo
+33,"Surf City",RABCH029,39.65393212,-74.17430941,SurfCity
+34,"IBSP 1",RABCH030,39.85259733,-74.08542592,IBSP1
+35,"Seaside Heights",RABCH031,39.94741387,-74.0698889,SeaHgts
+36,"North Beach Haven",RABCH032,39.57085249,-74.23354388,NrthBchHavn
+37,"Loveladies",RABCH033,39.72501814,-74.12593887,Ladies
+38,"Normandy Beach",RABCH034,40.00028215,-74.05989079,NormdyBch
+39,"Sea Bright",RABCH036,40.35971972,-73.97380006,SeaBright
+40,"Thomson Beach",RABCH037,40.42153428,-74.0610333,ThomBch
+41,"East Long Branch Station",RABCH038,40.30851826,-73.98008856,ELngBrnchSta
+43,"Fishing Creek at Rio Grande",RA040,39.02772707,-74.89642447,FishingCrk
+44,"Cohansey River Lower",RA046,39.38077264,-75.33514118,LowCohRiv
+45,"Dennis Creek",RA041,39.17765359,-74.82990473,DennisCrk
+46,"Alloway Creek",RA051,39.50604893,-75.47685788,AllowayCrk
+47,"West Creek near Leesburg",RA042,39.25984648,-74.91177188,WestCrk
+48,"Mill Creek",RA047,39.39676835,-75.18073722,MillCrk
+49,"Gravelly Run at Laurel Lake",RA043,39.33757222,-75.05124722,GravellyRun
+50,"Cohansey River at Seeley",RA048,39.47260352,-75.2553951,CohRivSeeley
+51,"Salem River Lower Trib",RA064,39.63380547,-75.50983417,SalemRivLower
+52,"Alloway Creek 2",RA056,39.56469433,-75.34423241,AllowayCrk2
+53,"Tuckahoe River",RA045,39.37077452,-74.85471699,TuckahoeRiv
+54,"Maurice River at Norma",RA054,39.49553965,-75.07646989,MauriceRivNor
+55,"Great Egg Harbor River Lower",RA044,39.32666707,-74.69642636,GreatEggRiv
+56,"Salem River at Woodstown",RA063,39.64360289,-75.33039889,SalemRivWoods
+57,"Muddy Run",RA057,39.57892462,-75.16619514,MuddyRun
+58,"Manantico Creek",RA049,39.47728496,-74.94855032,MananticoCrk
+59,"Indian Branch near Malaga",RA058,39.5907673,-75.05971154,IndBrnchMalag
+60,"Oldsman Creek",RA074,39.78638199,-75.41047268,OldsmanCrk
+61,"Babcock Creek near Mays Landing",RA050,39.46895132,-74.69251579,BabcockCrk
+62,"Raccoon Creek near Swedesboro",RA069,39.74040926,-75.25885851,RacoonCrk
+63,"Hospitality Branch at Blue Bell Rd near Cecil",RA062,39.64449401,-74.98575261,HospitalityBrc
+64,"Great Egg Harbor River Upper",RA055,39.54865919,-74.80082972,UGrtEggHbRiv
+65,"Mantua Creek Upper",RA068,39.725833,-75.11255163,UMantuaCrk
+66,"Mantua Creek",RA075,39.8356015,-75.22996539,MantuaCrk
+67,"Nacote Creek",RA052,39.50611111,-74.50555556,NacoteCrk
+68,"Great Egg Harbor River Upper 2",RA070,39.75392938,-74.96600382,UGrtEggHbRiv2
+69,"Blue Anchor Brook at Elm",RA065,39.68819182,-74.8344702,BlueAnchorBrk
+70,"Hammonton Creek at Westcoatville",RA061,39.63375,-74.71803,HammontonCrk
+71,"North Branch Big Timber Creek at Glendora",RA076,39.83448478,-75.06679608,NBrnchBitTimb
+72,"Mullica River",RA059,39.60326355,-74.58665233,MullicaRiv
+73,"Great Egg Harbor Bay",RA053,39.51773777,-74.36998393,GrtEggHrbrBay
+74,"Batsto River at Quaker Bridge",RA067,39.70962992,-74.66634377,BatstoRiv
+75,"Cooper River at Haddonfield",RA083,39.90325166,-75.02189764,CooperRiv
+76,"Haynes Creek",RA077,39.82537526,-74.88246613,HaynesCrk
+77,"Batsto River Upper",RA073,39.78294337,-74.74066671,UBatstoRiv
+78,"West Branch Wading River at Maxwell",RA066,39.67510833,-74.54078889,WBrnchWadRiv
+79,"East Branch Bass River near New Gretna",RA060,39.6233765,-74.44112094,EBrnchBassRiv
+80,"North Branch Pennsauken Creek",RA084,39.94020275,-74.95162604,NBrnchPennskn
+81,"Little Creek at Chairville",RA082,39.89842394,-74.78813941,LittleCrk
+82,"Wading River",RA072,39.77779707,-74.53008014,WadingRiv
+83,"Friendship Creek",RA079,39.8593879,-74.64313754,FriendshipCrk
+84,"Oswego River",RA071,39.74220345,-74.3898548,OswegoRiv
+85,"Rancocas Creek Lower",RA089,40.00636212,-74.8962597,LRancocasCrk
+86,"North Branch Rancocas Creek at Iron Works Park at Mount Holly",RA088,39.98944445,-74.78472222,NBrnchRanc
+87,"Greenwood Branch at New Lisbon Rd",RA085,39.95634132,-74.62766036,GrnwoodBrnch
+88,"McDonalds Branch in Byrne State Forest",RA081,39.8850592,-74.50543849,McDonaldsBrnc
+89,"Assiscunk Creek",RA090,40.06434191,-74.75829604,AssicunkCrk
+90,"North Branch Forked River",RA078,39.82557389,-74.28103237,NBrnchForkRiv
+91,"Cedar Creek at Cedar Crest",RA080,39.89729275,-74.31628692,CedarCrk
+92,"North Branch Rancocas Creek Upper",RA087,39.99949148,-74.48040825,UNBrnchRanc
+93,"Blacks Creek at Chesterfield",RA095,40.10965486,-74.64166635,BlacksCrk
+94,"Ridgeway Branch",RA086,39.99683726,-74.35529478,RidgwayBrnch
+95,"Assunpink Creek at Peace St at Trenton",RA101,40.21720512,-74.76637197,AssupinkCrkPeace
+96,"Crosswicks Creek at Groveville Rd at Groveville",RA099,40.1767918,-74.68016631,CrosswicksCrk
+97,"Lahaway Creek",RA094,40.10972637,-74.4972658,LahwayCrk
+98,"Ridgeway Branch 2",RA091,40.06051766,-74.40541101,RidgwayBrnch2
+99,"Jacobs Creek",RA108,40.31546231,-74.83795048,Jacobs Creek
+100,"Doctors Creek",RA098,40.16925116,-74.55444799,DoctorsCrk
+101,"Toms River near Toms River",RA092,40.04386882,-74.25376916,TomsRiv
+102,"Wickecheoke Creek",RA116,40.42299895,-74.97985369,WickecheokCrk
+103,"Assunpink Creek 2",RA107,40.29457993,-74.69306489,AssupinkCrk 2
+104,"Miry Run at Rt 533 at Mercerville",RA103,40.24736525,-74.59957893,MiryRun
+105,"Toms River Upper",RA097,40.16087138,-74.39324618,UTomsRiver
+106,"North Branch Metedeconk River at Lakewood",RA093,40.11007033,-74.21889993,MetedcnkRiv
+107,"Musconetcong River at Riegelsville",RA125,40.59227924,-75.18657022,MusconetRivRieg
+108,"Nishisakawick Creek near Frenchtown",RA121,40.54295655,-75.04703717,NishisakawCrk
+109,"Stony Brook Trib 3",RA115,40.41440505,-74.78993487,StoneyBrkTrib
+110,"Millstone River near Grovers Mill",RA109,40.31370792,-74.58870257,MillstoneRivGrover
+111,"Millstone River Upper",RA102,40.23374458,-74.39602784,UMillstoneRiv
+112,"Neshanic River",RA117,40.47166667,-74.82805556,NeshanicRiv
+113,"Heathcote Brook at Kingston",RA113,40.36998656,-74.61582725,HeathcoteBrk
+114,"Manalapan Brook at Federal Rd near Manalapan",RA106,40.29614815,-74.39786157,ManalapanBrk
+115,"Manasquan River",RA100,40.20444544,-74.26903423,ManasquanRiv
+116,"Mingamahone Brook",RA096,40.16406904,-74.14819803,MingamahonBrk
+117,"McGellairds Brook",RA105,40.28306764,-74.29506223,McGellairsBrk
+118,"South Branch Raritan River",RA122,40.56756012,-74.86424002,SBrnchRarRiv
+119,"Lawrence Brook",RA114,40.41936384,-74.49146695,LawrenceBrk
+120,"Mulhockaway Creek at Van Syckel",RA126,40.64747186,-74.96879925,MulhockCrk
+121,"South Branch Raritan River at South Branch",RA120,40.54684967,-74.69648567,SBrnchRarRivSB
+122,"Millstone River at Blackwells Mills",RA118,40.47488012,-74.57591245,MillstoneRivBlack
+123,"South River",RA112,40.40071267,-74.37457794,SouthRiv
+124,"Pine Brook",RA104,40.28984806,-74.12185329,PineBrook
+125,"Pohatcong River",RA131,40.73578729,-75.04139743,PohatcongRiv
+126,"Raritan River Lower",RA119,40.48815633,-74.4241735,LRarRiv
+127,"Matawan Creek 2",RA111,40.39709354,-74.23095638,MatwanCrk2
+128,"Rockaway Creek",RA130,40.69035876,-74.81063787,RockawayCrk
+129,"Lamington River at Burnt Mills",RA127,40.63466779,-74.68672135,LamingtonRiv
+130,"Swimming River",RA110,40.35473848,-74.07793454,SwimmingRiv
+131,"Pequest River at Belvidere",RA142,40.82934587,-75.0787411,PequestRiv
+132,"Musconetcong River 2",RA132,40.7717841,-74.90269102,MusconetRiv2
+133,"Bound Brook at Rt 28 at Middlesex",RA123,40.58533862,-74.50740033,BoundBrk
+134,"Passaic River near Millington",RA128,40.66030512,-74.52577405,PassaicRivMilgton
+135,"Dunnfield Creek at Dunnfield",RA152,40.97101686,-75.12678026,DunnfldCrk
+136,"North Branch Raritan River",RA133,40.73968257,-74.62931946,NBrnchRarRiv
+137,"Pequest River Middle",RA143,40.89505707,-74.90289656,MPequestRiv
+138,"South Branch Raritan River Upper",RA141,40.83535058,-74.74191329,USBrnchRarRiv
+139,"Rahway River Lower",RA124,40.60097928,-74.24231679,LRahwayRiv
+140,"Paulins Kill at Blairstown",RA151,40.9811448,-74.95346118,PaulinsKillBlair
+141,"Primrose Brook at Morristown National Historic Park",RA134,40.7601848,-74.53070839,PrimoseBrk
+142,"Rahway River near Springfield",RA129,40.68767,-74.31186,RahwayRiv
+143,"Musconetcong River",RA144,40.91552897,-74.72585235,MusconetRiv
+144,"Whippany River",RA140,40.82724496,-74.55823589,WhippanyRiv
+145,"Passaic River below Canoe",RA135,40.76110048,-74.37756796,PassaicRivCanoe
+146,"Pequest River Upper",RA150,40.98111111,-74.77638889,UPequestRiv
+147,"Flat Brook near Flatbrookville",RA153,41.10637,-74.95227,FlatBrk
+148,"Whippany River near Pine Brook",RA139,40.84531128,-74.34705011,WhippanyRivPine
+149,"Paulins Kill",RA154,41.07379578,-74.79690944,PaulinsKill
+150,"Rockaway River",RA149,40.97001717,-74.55453549,RockawayRiv
+151,"Rockaway River near Rockaway",RA145,40.92248856,-74.4386266,RockawayRivRk
+152,"Passaic River Lower",RA136,40.80026928,-74.13711791,LPassaicRiv
+153,"Wallkill River at Sparta",RA155,41.0389786,-74.63013039,WallkillRivSprta
+154,"Passaic River at Two Bridges",RA138,40.89738,-74.27276,PassaicRiv2Brdg
+155,"Big Flat Brook Upper",RA164,41.19957121,-74.81582666,BigFlatBrk
+156,"Papakating Creek at Pellettown",RA163,41.16261614,-74.67529086,PapakatingCrk
+157,"Pequannock River",RA156,41.0658759,-74.48563069,PequanRiv
+158,"Pequannock River at Macopin Intake Dam",RA157,41.0184544,-74.40105594,PequanRivMacop
+159,"Pompton River at Pompton Plains",RA148,40.96927929,-74.2818469,PomptonRiv
+160,"Saddle River at Lodi",RA137,40.89037,-74.08071,SaddleRiv
+161,"Lake Hopatcong",RA158,41.04861481,-74.29865233,LakeHopatcong
+162,"Wallkill River near Sussex",RA162,41.19395289,-74.57508884,WallkillRivSusex
+163,"Hohokus Brook",RA147,41.0059163,-74.12633298,HohokusBrk
+164,"Clove Brook",RA165,41.2702111,-74.62301618,CloveBrk
+165,"Double Kill at Wawayanda",RA161,41.18692777,-74.41986944,DblKill
+166,"Dwars Kill at Anderson Ave at Alpine",RA146,40.97676468,-73.93402556,DwarsKill
+167,"Ramapo River near Mahwah",RA160,41.09678862,-74.16544417,RamapoRiv
+168,"Hackensack River",RA159,41.03666667,-74.03916667,HackensackRiv
