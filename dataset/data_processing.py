@@ -142,9 +142,9 @@ def preprocess_static_features(basin_chars_df):
     # Scale each feature individually
     basin_features_scaled = basin_features.copy()
 
-    # DANGEROUS: RANDOMIZE static feature experiment
-    basin_features_scaled[:] = np.random.randint(0, 10, size=basin_features.shape)
-    print("DANGEROUS !!!!!")
+    # # DANGEROUS: RANDOMIZE static feature experiment
+    # basin_features_scaled[:] = np.random.randint(0, 10, size=basin_features.shape)
+    # print("DANGEROUS !!!!!")
     print(basin_features.head())
     print(basin_features_scaled.head())
 

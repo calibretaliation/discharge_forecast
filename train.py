@@ -35,6 +35,7 @@ class TrainingConfig:
     # Paths
     PROCESSED_DATA_DIR = Path("dataset/processed_camels_discharge_only")
     # PRETRAIN_MODEL_PATH = "weights/camels/best_gwnet_model.pt"
+    PRETRAIN_MODEL_PATH = "None" #Train from scratch
     BEST_MODEL_SAVE_PATH = "weights/camels/best_gwnet_model.pt"
     PLOT_SAVE_DIR = Path("plots/training/discharge_only")
     INPUT_DATA_DIR = "dataset/data_camels"
