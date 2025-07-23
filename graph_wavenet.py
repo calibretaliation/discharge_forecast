@@ -35,6 +35,7 @@ class gcn(nn.Module):
         for a in support:
             x1 = self.nconv(x,a)
             out.append(x1)
+            
             for k in range(2, self.order + 1):
                 x2 = self.nconv(x1,a)
                 out.append(x2)
