@@ -18,7 +18,8 @@ import matplotlib.pyplot as plt
 from dataset.generate_training_data import prepare_dataloaders, get_adjacency_matrix_and_supports
 from graph_wavenet import gwnet
 from model import NhatModelBlock
-
+from DSTAGNN import make_model
+from ASTGCRN import ASTGCRN
 # --- Configuration ---
 class TrainingConfig:
     # Data and Model Config
@@ -31,7 +32,7 @@ class TrainingConfig:
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     num_epochs = 50
     batch_size = 32
-    learning_rate = 5e-4
+    learning_rate = 1e-4
     
     MODEL = "nhat"  # Model type, can be "gwnet" or "nhat"
     DATASET = "camels"
@@ -40,7 +41,7 @@ class TrainingConfig:
         PROCESSED_DATA_DIR = Path("dataset/processed_masked_camels")
         # PRETRAIN_MODEL_PATH = "weights/camels/best_gwnet_model.pt"
         PRETRAIN_MODEL_PATH = "None" #Train from scratch
-        BEST_MODEL_SAVE_PATH = f"weights/camels/nse{MODEL}_model_mask.pt"
+        BEST_MODEL_SAVE_PATH = f"weights/camels/nse_{MODEL}_model_mask.pt"
         PLOT_SAVE_DIR = Path(f"plots/training/nse_{MODEL}_masked_camels")
         INPUT_DATA_DIR = "dataset/data_camels"
     else:
@@ -219,11 +220,11 @@ class Trainer:
     def train_epoch(self):
         self.model.train()
         total_loss = 0
-        for x_batch, y_batch, x_mask, y_mask in tqdm(self.train_loader, desc="Training", leave=False):
+        progress = tqdm(self.train_loader, desc="Training", leave=False)
+        for x_batch, y_batch, x_mask, y_mask in progress:
             x_batch = x_batch.to(self.config.device)
             y_batch = y_batch.to(self.config.device)
             y_mask = y_mask.to(self.config.device)
-            
             self.optimizer.zero_grad()
             
             # Dataloader provides: (batch, seq_len, nodes, features)
@@ -242,7 +243,9 @@ class Trainer:
             
             self.optimizer.step()
             total_loss += loss.item()
-        return total_loss / len(self.train_loader)
+            train_loss = total_loss / len(self.train_loader)
+            progress.set_postfix({'loss': f'{(total_loss/(progress.n + 1)):.2f}'})
+        return train_loss
         
     
     def eval_epoch(self):
@@ -332,7 +335,7 @@ class Trainer:
 
             if avg_val_loss < best_val_loss and not np.isnan(avg_val_loss):
                 best_val_loss = avg_val_loss
-                print(f"New best validation loss: {best_val_loss:.4f}. Saving model...")
+                print(f"New best validation loss: {best_val_loss:.4f}. Saving model to {self.config.BEST_MODEL_SAVE_PATH}")
                 torch.save(self.model.state_dict(), self.config.BEST_MODEL_SAVE_PATH)
                 try:
                     new_adj = self.model.get_learned_adj()[0]
@@ -462,6 +465,21 @@ def main():
     elif config.MODEL == "nhat":    
         edge_index = torch.tensor(adj_matrix.nonzero(), dtype=torch.long).contiguous().to(config.device) if adj_matrix is not None else None
         model = NhatModelBlock(edge_index=edge_index, config=config, num_blocks=2).to(config.device)
+    elif config.MODEL == "dstagnn":
+        adj_matrix = np.load("/aul/homes/nhoan009/discharge_forecast/dataset/data_camels/dstagnn_adjacency_matrix.npy")
+        model = make_model(config.device, config.in_feat, nb_block = 2, in_channels = config.in_feat, K = 2, nb_chev_filter = 16, nb_time_filter = 16, 
+                           time_strides = 1, adj_mx = adj_matrix, adj_pa = adj_matrix, adj_TMD = adj_matrix, num_for_predict = config.pred_len, len_input = config.seq_len, num_of_vertices = num_nodes, 
+                           d_model = 64, d_k = 16, d_v = 16, n_heads = 4)
+    elif config.MODEL == "astgcrn":
+        model = ASTGCRN(
+            num_nodes=num_nodes,
+            input_dim=num_input_features,
+            hidden_dim = 64,
+            output_dim = 1,
+            seq_len = config.seq_len,
+            horizon = config.pred_len,
+            num_layers = 3,
+            device = config.device).to(config.device)
     # load pretrained weights if available
     # if Path(config.PRETRAIN_MODEL_PATH).exists():
     #     print(f"Loading pretrained model weights from {config.PRETRAIN_MODEL_PATH}")
@@ -486,43 +504,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-    # config = TrainingConfig()
-    # print("--- Starting GraphWaveNet Training ---")
-    # train_loader, val_loader, _, adj_matrix = prepare_dataloaders(config=config)
-
-    # try:
-    #     with open(config.SCALER_PATH, 'rb') as f:
-    #         scaler = pickle.load(f)
-    #     print(f"Loaded node-wise scalers from {config.SCALER_PATH}")
-    # except FileNotFoundError:
-    #     print(f"Error: Scaler file not found at {config.SCALER_PATH}. Cannot perform evaluation correctly.")
-    # all_y_true_unscaled = []
-    # all_y_pred_unscaled = []
-    # for x_batch, y_batch in tqdm(val_loader, desc="Validating", leave=False):
-    #     y_batch = y_batch.to(config.device)
-    #     y_target = y_batch.squeeze(-1)
-    #     output = torch.zeros(y_target.shape)
-
-    #     # unscale_data expects (batch, nodes, pred_len)
-    #     y_target_unscaled = unscale_data(y_target, scaler[0])
-    #     output_unscaled = y_target_unscaled[0,:,0].repeat(y_target_unscaled.shape[0], y_target_unscaled.shape[2], 1).permute(0,2,1)
-    #     all_y_pred_unscaled.append(output_unscaled)
-    #     all_y_true_unscaled.append(y_target_unscaled) # Keep y_target in (batch, nodes, pred_len) format
-
-    # all_y_true = torch.cat(all_y_true_unscaled, dim=0)
-    # all_y_pred = torch.cat(all_y_pred_unscaled, dim=0)
-
-    # num_nodes = all_y_true.shape[1]
-    # batch_size = all_y_true.shape[0]
-    # nse_per_node = []
-    # for i in range(num_nodes):
-    #     for j in range(batch_size):
-    #         y_true_node_i = all_y_true[j, i, :].flatten()
-    #         y_pred_node_i = all_y_pred[j, i, :].flatten()
-    #         node_nse = calculate_nse(y_true_node_i, y_pred_node_i)
-    #         nse_per_node.append(node_nse)
-    # valid_nses = [n for n in nse_per_node if abs(n) < 1e4]  # Filter out extreme NSE values
-    # average_nse = np.mean(valid_nses) if valid_nses else -np.inf
-
-    # print("AVERAG NSE: ", average_nse)
