@@ -6,6 +6,7 @@ import pandas as pd
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 import numpy as np
 import pickle
 import sys
@@ -17,7 +18,7 @@ import matplotlib.pyplot as plt
 # Assuming these files are in the same directory
 from dataset.generate_training_data import prepare_dataloaders, get_adjacency_matrix_and_supports
 from graph_wavenet import gwnet
-from model import NhatModelBlock
+from model import gwnet_new
 from DSTAGNN import make_model
 from ASTGCRN import ASTGCRN
 # --- Configuration ---
@@ -35,21 +36,21 @@ class TrainingConfig:
     learning_rate = 1e-4
     
     MODEL = "nhat"  # Model type, can be "gwnet" or "nhat"
-    DATASET = "camels"
+    DATASET = "ours"
     if DATASET == "camels":
         # Path
         PROCESSED_DATA_DIR = Path("dataset/processed_masked_camels")
         # PRETRAIN_MODEL_PATH = "weights/camels/best_gwnet_model.pt"
         PRETRAIN_MODEL_PATH = "None" #Train from scratch
-        BEST_MODEL_SAVE_PATH = f"weights/camels/nse_{MODEL}_model_mask.pt"
-        PLOT_SAVE_DIR = Path(f"plots/training/nse_{MODEL}_masked_camels")
+        BEST_MODEL_SAVE_PATH = f"weights/camels/{MODEL}_model_mask.pt"
+        PLOT_SAVE_DIR = Path(f"plots/training/{MODEL}_masked_camels")
         INPUT_DATA_DIR = "dataset/data_camels"
     else:
         PROCESSED_DATA_DIR = Path("dataset/processed_masked")
         # PRETRAIN_MODEL_PATH = "weights/camels/best_gwnet_model.pt"
         PRETRAIN_MODEL_PATH = "None" #Train from scratch
-        BEST_MODEL_SAVE_PATH = f"weights/ours/nse_best_{MODEL}_model_mask.pt"
-        PLOT_SAVE_DIR = Path(f"plots/training/nse_{MODEL}_masked")
+        BEST_MODEL_SAVE_PATH = f"weights/ours/{MODEL}_model_mask.pt"
+        PLOT_SAVE_DIR = Path(f"plots/training/{MODEL}_masked")
         INPUT_DATA_DIR = "dataset/data"
     SCALER_PATH = PROCESSED_DATA_DIR / "timeseries_node_scalers.pkl"
     ADJ_MATRIX_PATH = PROCESSED_DATA_DIR / "adjacency_matrix.pkl"
@@ -113,7 +114,7 @@ def calculate_nse(y_true, y_pred):
 
 
 class Trainer:
-    def __init__(self, model, optimizer, criterion, train_loader, val_loader, config, supports, scaler, site_order, log_const):
+    def __init__(self, model, optimizer, scheduler, criterion, train_loader, val_loader, config, supports, scaler, site_order, log_const):
         self.model = model
         self.optimizer = optimizer
         self.criterion = criterion
@@ -127,7 +128,7 @@ class Trainer:
         self.val_nse_history = []
         self.site_order = site_order
         self.log_const = log_const
-
+        self.scheduler = scheduler
     def plot_metrics(self):
             """Plots and saves the training and validation metrics."""
             print("Plotting training metrics...")
@@ -168,9 +169,9 @@ class Trainer:
             output = self.model(x_permuted).squeeze(1)
             row = 0
             col = 0
-            nrows = 4
-            ncols = 4
-            fig, ax = plt.subplots(nrows= nrows, ncols = ncols, figsize = (20,10))
+            nrows = 8
+            ncols = 8
+            fig, ax = plt.subplots(nrows= nrows, ncols = ncols, figsize = (40,20))
             while row < nrows:
                 # Choose a random sample and node from the batch to plot
                 sample_idx = np.random.randint(0, x_batch.size(0))
@@ -323,7 +324,7 @@ class Trainer:
         for epoch in range(self.config.num_epochs):
             avg_train_loss = self.train_epoch()
             avg_val_loss, val_nse, valid_nses = self.eval_epoch()
-
+            self.scheduler.step(avg_val_loss)
             self.train_loss_history.append(avg_train_loss)
             self.val_loss_history.append(avg_val_loss)
             self.val_nse_history.append(val_nse)
@@ -463,8 +464,13 @@ def main():
             supports=supports
         ).to(config.device)
     elif config.MODEL == "nhat":    
-        edge_index = torch.tensor(adj_matrix.nonzero(), dtype=torch.long).contiguous().to(config.device) if adj_matrix is not None else None
-        model = NhatModelBlock(edge_index=edge_index, config=config, num_blocks=2).to(config.device)
+        model = gwnet_new(
+            device=config.device,
+            num_nodes=num_nodes,
+            in_dim=num_input_features,
+            out_dim=config.pred_len,
+            supports=supports
+        ).to(config.device)
     elif config.MODEL == "dstagnn":
         adj_matrix = np.load("/aul/homes/nhoan009/discharge_forecast/dataset/data_camels/dstagnn_adjacency_matrix.npy")
         model = make_model(config.device, config.in_feat, nb_block = 2, in_channels = config.in_feat, K = 2, nb_chev_filter = 16, nb_time_filter = 16, 
@@ -487,7 +493,8 @@ def main():
     
     criterion = nn.HuberLoss()
     optimizer = optim.Adam(model.parameters(), lr=config.learning_rate, weight_decay=1e-4)
-    
+    scheduler = ReduceLROnPlateau(optimizer, "min")
+
     try:
         with open(config.SCALER_PATH, 'rb') as f:
             scaler = pickle.load(f)
@@ -496,7 +503,7 @@ def main():
         print(f"Error: Scaler file not found at {config.SCALER_PATH}. Cannot perform evaluation correctly.")
         return
         
-    trainer = Trainer(model, optimizer, criterion, train_loader, val_loader, config, supports, scaler, site_order, log_const)
+    trainer = Trainer(model, optimizer, scheduler, criterion, train_loader, val_loader, config, supports, scaler, site_order, log_const)
     trainer.train()
     
     print("--- Training Complete ---")
