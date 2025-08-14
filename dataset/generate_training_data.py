@@ -115,6 +115,7 @@ def create_spatio_temporal_sequences(dynamic_data, static_features, all_mask,
         if static_features is not None:
             x_combined = np.concatenate((x_combined, static_features_tiled), axis=-1)
             x_mask = np.concatenate((x_mask, static_features_tiled), axis=-1)
+
         X_list.append(x_combined)
         X_list_mask.append(x_mask)
         
@@ -344,6 +345,8 @@ def prepare_dataloaders(config=None):
     # Load and align data from all sources
     discharge_pivot, forcings_df, basin_chars_df = load_and_align_data(use_all_forcings = config.USE_ALL_FORCINGS, input_data_dir = config.INPUT_DATA_DIR)
     print("DISCHARGE PIVOT: ", discharge_pivot.shape)
+    # cutoff discharge pivot to take data only from 2020 to 2024
+    # discharge_pivot = discharge_pivot.loc["2020-01-01":"2024-12-31"]
     # Process static features to get the final list of valid sites
     static_features = preprocess_static_features(basin_chars_df, config)
     final_site_order = static_features.index.tolist()
