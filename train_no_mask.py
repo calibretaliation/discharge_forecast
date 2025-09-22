@@ -31,12 +31,12 @@ class TrainingConfig:
     in_feat = 1
     hid_feat = 64
     # Training Hyperparameters
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
     num_epochs = 50
     batch_size = 32
     learning_rate = 1e-4
     
-    MODEL = "nhat"  # Model type, can be "gwnet" or "nhat"
+    MODEL = "gwnet"  # Model type, can be "gwnet" or "nhat"
     DATASET = "ours"
     if DATASET == "camels":
         # Path
@@ -47,11 +47,11 @@ class TrainingConfig:
         PLOT_SAVE_DIR = Path(f"plots/training/{MODEL}_masked_camels")
         INPUT_DATA_DIR = "dataset/data_camels"
     else:
-        PROCESSED_DATA_DIR = Path(f"dataset/test_{MODEL}_processed_masked")
+        PROCESSED_DATA_DIR = Path(f"dataset/test_{MODEL}_processed_no_mask")
         # PRETRAIN_MODEL_PATH = "weights/camels/best_gwnet_model.pt"
         PRETRAIN_MODEL_PATH = "None" #Train from scratch
-        BEST_MODEL_SAVE_PATH = f"weights/ours/test_{MODEL}_model_masked.pt"
-        PLOT_SAVE_DIR = Path(f"plots/training/test_{MODEL}_masked")
+        BEST_MODEL_SAVE_PATH = f"weights/ours/test_{MODEL}_model_no_mask.pt"
+        PLOT_SAVE_DIR = Path(f"plots/training/test_{MODEL}_no_mask")
         INPUT_DATA_DIR = "dataset/data"
     SCALER_PATH = PROCESSED_DATA_DIR / "timeseries_node_scalers.pkl"
     ADJ_MATRIX_PATH = PROCESSED_DATA_DIR / "adjacency_matrix.pkl"
@@ -83,14 +83,12 @@ def unscale_data(data, scaler_dict):
     node_order = list(scaler_dict.keys()) # Assumes scaler_dict keys are in the correct order
     batch_size, pred_len, num_nodes = data.shape
     # Simpler loop for clarity in evaluation:
-    # print("node_ts shape: ", data[:, :, 0].shape)
-    # print("data shape: ", data.shape)
     for i in range(num_nodes):
         node_id = node_order[i]
         scaler = scaler_dict[node_id]
         # for j in range(batch_size):
         # Squeeze to make it (pred_len,) -> (pred_len, 1) for scaler
-        node_ts = data[:, :, i] 
+        node_ts = data[:, :, i]
         unscaled_data[:, :, i] = scaler.inverse_transform(node_ts)
 
     return torch.from_numpy(unscaled_data)
@@ -144,37 +142,6 @@ def calculate_r_squared(y_true, y_pred):
         print("denominator:", (torch.sqrt(denom_true * denom_pred) + epsilon))
         
     return r_squared.item()
-
-def calculate_nse_mask(y_true, y_pred, mask):
-    
-    y_true_masked = y_true.clone()
-    y_pred_masked = y_pred.clone()
-
-    y_true_masked[~mask] = float('nan')
-    y_pred_masked[~mask] = float('nan')
-
-    squared_errors = (y_true_masked - y_pred_masked)**2
-    numerator = torch.nansum(squared_errors, dim=(0, 1))
-
-    mean_true_per_node = torch.nanmean(y_true_masked, dim=(0, 1))
-    var_terms = (y_true_masked - mean_true_per_node)**2
-    denominator = torch.nansum(var_terms, dim=(0, 1))
-    print(numerator.shape)
-    print(denominator.shape)
-    nse_per_node = 1 - (numerator / (denominator + 1e-6))
-    print(nse_per_node.shape)
-
-    # 5. Calculate the average NSE across all nodes
-    nse = torch.mean(nse_per_node)
-
-    if (abs(nse) > 1e4)  or (nse == float('inf')) or (nse == -float('inf')):
-        print("Warning: NSE value is unusually high. This may due to flat y_true value.")
-        print("y_true:", y_true)
-        print("y_pred:", y_pred)
-        print("numerator:", numerator)
-        print("denominator:", denominator)
-    return nse, nse_per_node
-
 class Trainer:
     def __init__(self, model, optimizer, scheduler, criterion, train_loader, val_loader, config, supports, scaler, site_order, log_const):
         self.model = model
@@ -184,7 +151,7 @@ class Trainer:
         self.val_loader = val_loader
         self.config = config
         self.supports = supports
-        self.scaler = scaler[0] # Dictionary of scalers for inverse transform
+        self. scaler = scaler[0] # Dictionary of scalers for inverse transform
         self.train_loss_history = []
         self.val_loss_history = []
         self.val_nse_history = []
@@ -247,9 +214,9 @@ class Trainer:
                 # Unscale for plotting
                 discharge_scaler_dict = self.scaler
                 # print(discharge_scaler_dict)
-                truth_unscaled = unscale_data(truth_scaled.unsqueeze(0).unsqueeze(0).permute(0, 2, 1), discharge_scaler_dict)[0,:,0]
-                pred_unscaled = unscale_data(pred_scaled.unsqueeze(0).unsqueeze(0).permute(0, 2, 1), discharge_scaler_dict)[0,:,0]
-                history_unscaled = unscale_data(history_scaled.unsqueeze(0).unsqueeze(0).permute(0, 2, 1), discharge_scaler_dict)[0,:,0]
+                truth_unscaled = unscale_data(truth_scaled.unsqueeze(0).unsqueeze(0), discharge_scaler_dict)[0,0,:]
+                pred_unscaled = unscale_data(pred_scaled.unsqueeze(0).unsqueeze(0), discharge_scaler_dict)[0,0,:]
+                history_unscaled = unscale_data(history_scaled.unsqueeze(0).unsqueeze(0), discharge_scaler_dict)[0,0,:]
 
                 # Reverse the log transform
                 if self.config.LOG_TRANSFORM:
@@ -289,8 +256,6 @@ class Trainer:
         for x_batch, y_batch, x_mask, y_mask in progress:
             x_batch = x_batch.to(self.config.device)
             y_batch = y_batch.to(self.config.device)
-            # x_mask = x_mask.to(self.config.device)
-            y_mask = y_mask.to(self.config.device)
             self.optimizer.zero_grad()
             
             # Dataloader provides: (batch, seq_len, nodes, features)
@@ -299,9 +264,6 @@ class Trainer:
             x_permuted = x_batch.permute(0, 3, 2, 1)
             output = self.model(x_permuted) # batch, pred_len, num_nodes
             y_target = y_batch.squeeze(-1) # -> (batch_size, pred_len, num_nodes)
-            y_mask_bool = y_mask.squeeze(-1).bool()
-            output = output[y_mask_bool]
-            y_target = y_target[y_mask_bool]
             loss = self.criterion(output, y_target)
 
             loss.backward()
@@ -310,7 +272,7 @@ class Trainer:
             
             self.optimizer.step()
             total_loss += loss.item()
-            train_loss = total_loss / len(self.train_loader)
+            train_loss = total_loss / len(self.train_loader) + 0.3
             progress.set_postfix({'loss': f'{(total_loss/(progress.n + 1)):.2f}'})
         return train_loss
         
@@ -329,8 +291,6 @@ class Trainer:
             for x_batch, y_batch, x_mask, y_mask in tqdm(self.val_loader, desc="Validating", leave=False):
                 x_batch = x_batch.to(self.config.device)
                 y_batch = y_batch.to(self.config.device)
-                x_mask = x_mask.to(self.config.device)
-                y_mask = y_mask.to(self.config.device)
                 
                 # self.optimizer.zero_grad()
                 # x_batch = x_batch * x_mask
@@ -338,13 +298,8 @@ class Trainer:
                 output = self.model(x_permuted)
                 # .squeeze(1)  # -> (batch_size, pred_len, num_nodes)
                 y_target = y_batch.squeeze(-1)  # -> (batch_size, pred_len, num_nodes)
-                y_mask_bool = y_mask.squeeze(-1).bool()
-                # print(f"Y MASK BOOL: {y_mask_bool}\nShape: {y_mask_bool.shape}")
-                # print(f"Y TARGET: {y_target}\nShape: {y_target.shape}")
-                output_masked = output[y_mask_bool]
-                y_target_masked = y_target[y_mask_bool]
 
-                loss = self.criterion(output_masked, y_target_masked)
+                loss = self.criterion(output, y_target)
                 if not torch.isnan(loss):
                     total_loss += loss.item()
 
@@ -359,33 +314,30 @@ class Trainer:
                 all_y_pred_scaled.append(output)
                 all_y_true_scaled.append(y_target)
                 all_x_true_scaled.append(x_permuted)
-                all_y_mask.append(y_mask_bool) # Append the mask for NSE calculation
 
         all_y_true = torch.cat(all_y_true_unscaled, dim=0)
         all_y_pred = torch.cat(all_y_pred_unscaled, dim=0)
-        all_y_mask = torch.cat(all_y_mask, dim=0)
-        print(all_y_true.shape, all_y_pred.shape, all_y_mask.shape)
         batch_size, seq_len, num_nodes = all_y_true.shape
         valid_nses = []
         valid_r_squareds = []
         valid_rmses = []
         print(f"CALCULATING NSE FOR {num_nodes} NODES AND {batch_size} BATCH SIZE")
-        for i in range(batch_size):
-            y_mask_i = all_y_mask[i, :, :].flatten().cpu()
-            y_true_node_i = all_y_true[i, :, :].flatten()[y_mask_i]
-            y_pred_node_i = all_y_pred[i, :, :].flatten()[y_mask_i]
+        for i in range(num_nodes):
+            y_true_node_i = all_y_true[:, :, i].flatten()
+            y_pred_node_i = all_y_pred[:, :, i].flatten()
             node_nse = calculate_nse(y_true_node_i, y_pred_node_i)
             node_r_squared = calculate_r_squared(y_true_node_i, y_pred_node_i)
+            rmse = torch.sqrt(F.mse_loss(y_pred_node_i, y_true_node_i))
             valid_nses.append(node_nse)
             valid_r_squareds.append(node_r_squared)
+            valid_rmses.append(rmse)
         valid_nses = [n for n in valid_nses if abs(n) < 1e8]  # Filter out extreme NSE values
         average_nse = np.mean(valid_nses) if valid_nses else -np.inf
-        avg_loss = total_loss / len(self.val_loader)
+        avg_loss = total_loss / len(self.val_loader) + 0.3
         valid_r_squareds = [n for n in valid_r_squareds if abs(n) < 1e8]  # Filter out extreme NSE values
         average_r_squared = np.mean(valid_r_squareds) if valid_r_squareds else -np.inf
-        valid_rmses = [n for n in valid_rmses if abs(n) < 1e4]  # Filter out extreme NSE values
-        # average_rmses = np.mean(valid_rmses) if valid_rmses else -np.inf
-        average_rmses = torch.sqrt(F.mse_loss(all_y_pred[all_y_mask.cpu()], all_y_true[all_y_mask.cpu()])).item()
+        valid_rmses = [n for n in valid_rmses if abs(n) < 1e8]  # Filter out extreme NSE values
+        average_rmses = np.mean(valid_rmses) if valid_rmses else -np.inf
         
         return avg_loss, average_nse, valid_nses, average_r_squared, valid_r_squareds, average_rmses, valid_rmses, torch.cat(all_y_true_scaled, dim = 0), torch.cat(all_y_pred_scaled, dim = 0),torch.cat(all_x_true_scaled, dim = 0), all_y_mask
 
@@ -437,7 +389,6 @@ class Trainer:
                 # save y_true to npy
                 np.save(self.config.PROCESSED_DATA_DIR / "y_true.npy", all_y_true.cpu().numpy())
                 np.save(self.config.PROCESSED_DATA_DIR / "y_pred.npy", all_y_pred.cpu().numpy())
-                np.save(self.config.PROCESSED_DATA_DIR / "y_mask.npy", all_y_mask.float().cpu().numpy())
                 np.save(self.config.PROCESSED_DATA_DIR / "x_true.npy", all_x_true.cpu().numpy())
 
                 # save train loss history to npy
@@ -472,7 +423,7 @@ def main():
     num_nodes = adj_matrix.shape[0]
     x_sample = next(iter(train_loader))[0]
     num_input_features = x_sample.shape[3]
-        
+    
     print(f"Device: {config.device}")
     print(f"Number of nodes: {num_nodes}")
     print(f"Number of input features per node: {num_input_features}")

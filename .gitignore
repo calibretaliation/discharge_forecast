@@ -9,9 +9,7 @@ __pycache__
 tmp
 plots
 .venv
-dataset/nj
-dataset/processed_data
-dataset/processed*
+dataset/*
 dataset/*.zip
 weights
 dataset/rainfall_dataset.txt

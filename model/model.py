@@ -7,7 +7,7 @@ from torch.autograd import Variable
 import sys
 from torch_geometric.nn import GATConv
 
-from gat import GATLayerImp3
+from model.gat import GATLayerImp3
 
 
 class nconv(nn.Module):
@@ -263,7 +263,10 @@ class gwnet_new(nn.Module):
                                     out_channels=out_dim,
                                     kernel_size=(1,1),
                                     bias=True)
-
+        self.fc = nn.Conv2d(in_channels=30,
+                            out_channels=1,
+                            kernel_size=(1,1),
+                            bias=True)
         self.receptive_field = receptive_field
 
 
@@ -272,6 +275,7 @@ class gwnet_new(nn.Module):
         # if in_len<self.receptive_field:
         #     x = nn.functional.pad(input,(self.receptive_field-in_len,0,0,0))
         # else:
+        # input = input.permute(0, 3, 2, 1)
         x = input
         # print("START SHAPE: ", x.shape)
         x = self.start_conv(x)
@@ -370,7 +374,9 @@ class gwnet_new(nn.Module):
         x = F.relu(skip)
         x = F.relu(self.end_conv_1(x))
         x = self.end_conv_2(x)
-        return x[..., -1]
+        x = self.fc(x.permute(0, 3, 2, 1)).permute(0, 3, 2, 1)
+        # print("END shape: ", x.shape)
+        return x.squeeze()
 
     def get_learned_adj(self):
         return self.new_supports

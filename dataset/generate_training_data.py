@@ -84,10 +84,11 @@ def scale_data_splits(train_data, val_data, test_data, scaler_save_path):
     print("  Node-and-feature-wise scaling complete.")
 
     # Save the list of scaler dictionaries
-    scaler_save_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(scaler_save_path, "wb") as f:
-        pickle.dump(all_scalers, f)
-    print(f"  Saved scalers for all time series to {scaler_save_path}")
+    if scaler_save_path:
+        scaler_save_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(scaler_save_path, "wb") as f:
+            pickle.dump(all_scalers, f)
+        print(f"  Saved scalers for all time series to {scaler_save_path}")
 
     return scaled_train, scaled_val, scaled_test
 
@@ -286,7 +287,8 @@ def preprocess_static_features(basin_chars_df, config = None):
     for col in basin_features_scaled.columns:
         scaler = StandardScaler()
         basin_features_scaled[col] = scaler.fit_transform(basin_features[[col]])
-    
+    print("--- DEBUG: Head of Scaled Static Features ---")
+    print(basin_features_scaled.head())
     print(f"Processed basin characteristics data shape: {basin_features_scaled.shape}")
     return basin_features_scaled
 
@@ -421,7 +423,7 @@ def prepare_dataloaders(config=None):
         print("Configuration: Using static features.")
         
     
-    # 2. Split data chronologically BEFORE scaling
+    # Split data chronologically BEFORE scaling
     num_timesteps = dynamic_df.shape[0]
     train_end_idx = int(num_timesteps * train_ratio)
     val_end_idx = int(num_timesteps * (train_ratio + val_ratio))
@@ -435,7 +437,7 @@ def prepare_dataloaders(config=None):
     test_mask = mask_df[val_end_idx:]
 
     print("\n--- Checking for Distribution Shift ---")
-    # Assuming feature 0 is discharge
+    # feature 0 is discharge
     train_mean, train_std = np.mean(train_df[:, :, 0]), np.std(train_df[:, :, 0])
     val_mean, val_std = np.mean(val_df[:, :, 0]), np.std(val_df[:, :, 0])
 
